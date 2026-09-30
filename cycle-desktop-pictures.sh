@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
 #
 # Cycle the desktop picture through every wallpaper that comes with
 # Ubuntu 26.04 LTS, changing it every 30 minutes (or every MINUTES minutes).

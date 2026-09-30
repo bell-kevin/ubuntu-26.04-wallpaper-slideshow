@@ -126,6 +126,8 @@ Tested on Ubuntu 26.04.1 LTS with GNOME Shell 50.1.
 
 ## License
 
-MIT; see [LICENSE](LICENSE). The wallpapers aren't included here; they come
-from Ubuntu's own packages. This project isn't affiliated with or endorsed by
-Canonical. Ubuntu is a registered trademark of Canonical Ltd.
+GNU Affero General Public License, version 3. See [LICENSE](LICENSE).
+
+The wallpapers aren't included here; they come from Ubuntu's own packages.
+This project isn't affiliated with or endorsed by Canonical. Ubuntu is a
+registered trademark of Canonical Ltd.
