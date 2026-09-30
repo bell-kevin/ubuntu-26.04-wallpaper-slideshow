@@ -1,10 +1,12 @@
 # Ubuntu 26.04 Wallpaper Slideshow
 
 Cycle your desktop background through every wallpaper that ships with
-Ubuntu 26.04 LTS, changing every 30 minutes with a 5-second crossfade.
+Ubuntu 26.04 LTS, changing every 5 minutes with a 5-second crossfade. Want a
+particular picture? Pick it in **Settings → Appearance** as usual, and the
+slideshow carries on from there.
 
-It uses GNOME's built-in slideshow support, so nothing extra keeps running,
-and the slideshow carries on after every login.
+It uses GNOME's built-in slideshow support, so the slideshow carries on after
+every login.
 
 **Website:** <https://bell-kevin.github.io/ubuntu-26.04-wallpaper-slideshow/>
 
@@ -40,38 +42,43 @@ Your background changes right away. Run the script as yourself, not with
 
 - Builds a slideshow of every picture in `/usr/share/backgrounds` (the 26 that
   ship with Ubuntu 26.04, on a standard install) in random order.
-- Shows each one for 30 minutes, then fades into the next over 5 seconds.
+- Shows each one for 5 minutes, then fades into the next over 5 seconds.
 - Sets it for both light and dark style, since GNOME keeps a separate
   background for each. The lock screen shows it too, blurred.
-- Adds the slideshow to **Settings → Appearance** as a tile with a slideshow
-  icon, so you can switch back to it later.
+- Keeps going when you pick a picture in **Settings → Appearance** (or with
+  **Set as Background** in another app): your picture shows right away, and
+  5 minutes later the slideshow moves on.
 
 GNOME saves your background as a setting, so the slideshow keeps going after
-every login and reboot, and nothing runs in the background.
+every login and reboot. A small helper starts with your session to notice
+when you pick a picture. It sleeps the rest of the time.
 
 ## Everyday use
 
 | To | Do this |
 | --- | --- |
+| Jump to a picture | Pick it in Settings → Appearance; the slideshow carries on from it |
 | Change the interval | `./cycle-desktop-pictures.sh 20` (minutes per picture) |
 | Reshuffle the order | Run the script again |
-| Stop | Pick any other background in Settings → Appearance |
-| Start again | Pick the tile with the slideshow icon in Settings → Appearance |
+| Stop | `./cycle-desktop-pictures.sh --stop` (the current picture stays) |
+| Start again | Run the script again |
 
 The setting is per account: each person who wants the slideshow runs the
 script once while logged in as themselves.
 
-To uninstall, pick another background first, then remove the two files the
-script created:
+`--stop` also uninstalls: it removes the helper and every file the script
+created. If you've deleted the script, run the copy the helper uses:
 
 ```bash
-rm -r ~/.local/share/wallpaper-slideshow ~/.local/share/gnome-background-properties/all-ubuntu-wallpapers.xml
+~/.local/share/wallpaper-slideshow/cycle-desktop-pictures.sh --stop
 ```
 
 ## Only want Ubuntu's own slideshow?
 
 To switch to Ubuntu's built-in slideshow (21 pictures, 30 minutes each) for
-your account:
+your account, first run `./cycle-desktop-pictures.sh --stop` if you've been
+using this script. Otherwise it takes over again the next time you pick a
+picture. Then:
 
 ```bash
 gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/contest/resolute.xml
@@ -98,16 +105,24 @@ with how long to show each one and how long to fade between them. The script:
 1. Finds every picture in `/usr/share/backgrounds`, resolving symlinks so a
    picture with two names only appears once.
 2. Writes a shuffled slideshow file to `~/.local/share/wallpaper-slideshow/`.
-3. Lists it in `~/.local/share/gnome-background-properties/`, which is where
-   Settings looks for extra backgrounds.
-4. Points `org.gnome.desktop.background` `picture-uri` and `picture-uri-dark`
+3. Points `org.gnome.desktop.background` `picture-uri` and `picture-uri-dark`
    at it.
+4. Starts a helper: a systemd user service, `wallpaper-slideshow.service`,
+   that runs a copy of the script with `--watch`. It waits for the background
+   setting to change. When you pick a picture, it writes a new slideshow that
+   starts with that picture and switches to it about a second later.
 
 A few details:
 
-- GNOME Shell caches a slideshow by file name, so each run writes a new file
-  and deletes the old one. Otherwise a new interval or order wouldn't show
-  until the next login.
+- GNOME Shell caches a slideshow by file name, so each new slideshow gets a
+  new file and the old one is deleted. Otherwise a new interval or order
+  wouldn't show until the next login.
+- A picture of your own, added with **Add Picture…** in Settings, works too.
+  It's shown first and stays in the rotation until you pick another picture.
+- If you pick a different slideshow, the helper leaves it alone.
+- Earlier versions added a slideshow tile to Settings → Appearance, to switch
+  back after picking a picture. Picking a picture no longer stops the
+  slideshow, so running the script now removes that tile.
 - Terminals inside snap apps point `gsettings` at an outdated copy of GNOME's
   settings list that has no `picture-uri-dark`. The script clears those
   variables before calling `gsettings`, so it works from any terminal.
@@ -121,6 +136,10 @@ run the script again.
 
 **Some pictures stopped showing after upgrading Ubuntu.** A new release
 replaces the wallpaper packages. Run the script again to rebuild the list.
+
+**Picking a picture stops the slideshow.** The helper isn't running. Check
+with `systemctl --user status wallpaper-slideshow`, then run the script again
+to reinstall and restart it.
 
 Tested on Ubuntu 26.04.1 LTS with GNOME Shell 50.1.
 
