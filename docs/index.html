@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ubuntu 26.04 Wallpaper Slideshow</title>
+<meta name="description" content="Cycle through all 26 wallpapers that ship with Ubuntu 26.04 LTS using GNOME's built-in slideshow, and work around the hidden Community Slideshow bug.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#faf8f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141116" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ubuntu 26.04 Wallpaper Slideshow">
+<meta property="og:description" content="Every wallpaper that ships with Ubuntu 26.04, a new one every 30 minutes. One small script, nothing left running.">
+<meta property="og:url" content="https://bell-kevin.github.io/ubuntu-26.04-wallpaper-slideshow/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237b3f9e'/%3E%3Cstop offset='1' stop-color='%23d9582b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Crect x='12' y='15' width='40' height='27' rx='4' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M24 50h16' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root {
+    --bg: #faf8f6;
+    --surface: #ffffff;
+    --surface-2: #f4f0f3;
+    --text: #1f1a22;
+    --muted: #5f5766;
+    --border: #e6dfe7;
+    --accent: #7b3f9e;
+    --accent-hover: #653283;
+    --on-accent: #ffffff;
+    --good: #1f7a4d;
+    --bad: #b3261e;
+    --code-bg: #1d1820;
+    --code-text: #f4eef6;
+    --code-muted: #b8adbf;
+    --bezel: #17131a;
+    --stand: #2c2630;
+    --shadow: 0 1px 2px rgb(31 26 34 / 0.06), 0 12px 32px rgb(31 26 34 / 0.10);
+    --radius: 14px;
+    --mono: ui-monospace, "Ubuntu Mono", "DejaVu Sans Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141116;
+      --surface: #1c181f;
+      --surface-2: #241f28;
+      --text: #f1ecf3;
+      --muted: #b0a7b6;
+      --border: #342d39;
+      --accent: #c89af0;
+      --accent-hover: #d9b6f6;
+      --on-accent: #1c1020;
+      --good: #5fd49a;
+      --bad: #ff8a80;
+      --code-bg: #0f0c11;
+      --code-text: #efe9f2;
+      --code-muted: #a399a9;
+      --bezel: #0b090c;
+      --stand: #3a333f;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.45);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.65 system-ui, -apple-system, "Segoe UI", Ubuntu, Cantarell, "Noto Sans", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { color: var(--accent-hover); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 0.5em; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.1rem); }
+  h3 { font-size: 1.08rem; letter-spacing: 0; }
+  p { margin: 0 0 1em; }
+  code { font-family: var(--mono); font-size: 0.92em; }
+  :not(pre) > code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.08em 0.38em;
+    overflow-wrap: anywhere;
+  }
+  kbd {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 0.05em 0.4em;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .skip {
+    position: absolute; left: -9999px; top: 8px; z-index: 10;
+    background: var(--surface); padding: 8px 12px; border-radius: 8px;
+  }
+  .skip:focus { left: 8px; }
+
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  .wrap.narrow > * { max-width: 820px; }
+  @media (min-width: 720px) { .wrap { padding: 0 32px; } }
+
+  /* Header */
+  .site-header { border-bottom: 1px solid var(--border); }
+  .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text); text-decoration: none; }
+  .brand:hover { color: var(--text); }
+  .brand svg { width: 28px; height: 28px; flex: none; }
+  .nav { display: flex; gap: 20px; font-size: 0.95rem; }
+  .nav a { color: var(--muted); text-decoration: none; }
+  .nav a:hover { color: var(--text); }
+  @media (max-width: 560px) { .nav .hide-sm { display: none; } }
+
+  /* Hero */
+  .hero { padding: 56px 0 40px; }
+  .hero .wrap { display: grid; gap: 48px; align-items: center; }
+  @media (min-width: 920px) { .hero .wrap { grid-template-columns: 1.05fr 1fr; } }
+  .eyebrow {
+    display: inline-block; margin-bottom: 18px; padding: 4px 12px; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 600; color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); letter-spacing: -0.03em; margin-bottom: 18px; }
+  .lede { font-size: 1.15rem; color: var(--muted); max-width: 36em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 32px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
+    font-weight: 600; text-decoration: none; border-radius: 10px; border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover { background: var(--accent-hover); color: var(--on-accent); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+  .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 24px; color: var(--muted); font-size: 0.95rem; }
+  @media (min-width: 560px) { .facts { column-gap: 36px; } }
+  .facts strong { display: block; color: var(--text); font-size: 1.35rem; line-height: 1.3; }
+
+  /* Monitor illustration */
+  .monitor { margin: 0 auto; width: 100%; max-width: 540px; }
+  .screen {
+    position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #000;
+    border: 10px solid var(--bezel); border-radius: 16px;
+    box-shadow: 0 0 0 1px var(--border), var(--shadow);
+  }
+  .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+  .slide.is-active { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .slide { transition: none; }
+  }
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 7%; z-index: 2;
+    display: flex; align-items: center; justify-content: center; background: rgb(0 0 0 / 0.6);
+  }
+  .clock { color: #fff; font-weight: 600; font-size: clamp(9px, 1.7vw, 12px); font-variant-numeric: tabular-nums; }
+  .dock {
+    position: absolute; top: 7%; bottom: 0; left: 0; width: 7%; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 5%; padding-top: 4%;
+    background: rgb(0 0 0 / 0.45);
+  }
+  .dock i { width: 58%; aspect-ratio: 1; border-radius: 26%; background: rgb(255 255 255 / 0.85); }
+  .dock i:nth-child(2) { background: #f2a65a; }
+  .dock i:nth-child(3) { background: #7fb7ff; }
+  .dock i:nth-child(4) { background: #9be38f; }
+  .stand { width: 18%; height: 28px; margin: 0 auto; background: var(--stand); clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%); }
+  .base { width: 36%; height: 8px; margin: 0 auto; background: var(--stand); border-radius: 0 0 8px 8px; }
+  .caption { text-align: center; color: var(--muted); font-size: 0.88rem; margin-top: 14px; }
+
+  /* Abstract stand-ins for the wallpapers (not the real artwork) */
+  .s1 {
+    background:
+      radial-gradient(circle at 56% 50%, rgb(255 255 255 / 0.2) 0 6%, transparent 6.5%),
+      repeating-radial-gradient(circle at 56% 50%, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 22px),
+      radial-gradient(circle at 56% 50%, #8e3a78, #5b1d4f 50%, #2d0b28);
+  }
+  .s2 { background: linear-gradient(180deg, #dfe9b0 0%, #86a247 32%, #3f5c21 58%, #7563b3 80%, #3b2f68 100%); }
+  .s3 {
+    background:
+      radial-gradient(circle at 52% 44%, rgb(255 255 255 / 0.16) 0 9%, transparent 9.5%),
+      linear-gradient(160deg, #0c5f75, #0a7f96 60%, #11a3b4);
+  }
+  .s4 {
+    background:
+      radial-gradient(60% 40% at 35% 62%, rgb(61 220 151 / 0.6), transparent 70%),
+      radial-gradient(50% 35% at 68% 45%, rgb(138 92 246 / 0.55), transparent 70%),
+      linear-gradient(180deg, #050b16, #0b1b2e 70%, #06101c);
+  }
+  .s5 { background: linear-gradient(135deg, #3b1030 0%, #8f2f3f 40%, #d9582b 75%, #f39a4b 100%); }
+  .s6 {
+    background:
+      radial-gradient(1.5px 1.5px at 14% 24%, #fff, transparent),
+      radial-gradient(1px 1px at 30% 62%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 47% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 63% 74%, #fff, transparent),
+      radial-gradient(2px 2px at 81% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 91% 56%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 24% 84%, #fff, transparent),
+      radial-gradient(1px 1px at 72% 40%, #fff, transparent),
+      linear-gradient(180deg, #0a1233, #1c2d63 70%, #2b3f7a);
+  }
+  .s7 {
+    background:
+      radial-gradient(circle at 56% 50%, rgb(255 255 255 / 0.14) 0 6%, transparent 6.5%),
+      radial-gradient(circle at 56% 50%, #4a4a50, #2b2b30 60%, #1b1b1f);
+  }
+
+  /* Sections */
+  .block { padding: 64px 0; border-top: 1px solid var(--border); }
+  .section-lede { color: var(--muted); font-size: 1.05rem; max-width: 42em; }
+  .small { font-size: 0.92rem; color: var(--muted); }
+
+  .paths { display: grid; gap: 10px; margin: 24px 0; }
+  .path {
+    display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;
+  }
+  .path .mark { font-weight: 700; }
+  .path.bad .mark { color: var(--bad); }
+  .path.good .mark { color: var(--good); }
+  .path .label { font-size: 0.88rem; color: var(--muted); }
+  .path code { grid-column: 2; font-size: 0.98rem; overflow-wrap: anywhere; background: none; border: 0; padding: 0; }
+  .path ins { text-decoration: none; font-weight: 700; color: var(--good); background: color-mix(in srgb, var(--good) 16%, transparent); border-radius: 4px; padding: 0 2px; }
+
+  .code { color-scheme: dark; background: var(--code-bg); color: var(--code-text); border-radius: 12px; overflow: hidden; margin: 20px 0; box-shadow: var(--shadow); }
+  .code-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px;
+    padding: 6px 10px 6px 16px; font-size: 0.8rem; color: var(--code-muted); border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  }
+  .code pre {
+    margin: 0; padding: 16px; overflow-x: auto; font: 14.5px/1.7 var(--mono);
+    scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / 0.28) transparent;
+  }
+  .copy {
+    display: none; padding: 7px 12px; cursor: pointer; border-radius: 8px;
+    font: 600 0.8rem/1 system-ui, sans-serif; color: var(--code-text);
+    background: rgb(255 255 255 / 0.08); border: 1px solid rgb(255 255 255 / 0.16);
+  }
+  .js .copy { display: inline-block; }
+  .copy:hover { background: rgb(255 255 255 / 0.16); }
+
+  .notes { margin: 0; padding-left: 1.2em; color: var(--muted); }
+  .notes li + li { margin-top: 6px; }
+
+  .features { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); margin-top: 28px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .card svg { width: 26px; height: 26px; color: var(--accent); margin-bottom: 10px; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.98rem; }
+
+  .uses { margin: 24px 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .uses div { display: grid; grid-template-columns: 1fr; gap: 2px 24px; padding: 14px 18px; }
+  .uses div + div { border-top: 1px solid var(--border); }
+  @media (min-width: 640px) { .uses div { grid-template-columns: 210px 1fr; } }
+  .uses dt { font-weight: 600; }
+  .uses dd { margin: 0; color: var(--muted); }
+
+  .steps { list-style: none; counter-reset: step; margin: 28px 0; padding: 0; display: grid; gap: 18px; }
+  .steps li { counter-increment: step; position: relative; padding-left: 48px; color: var(--muted); }
+  .steps li strong { color: var(--text); }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: -1px; width: 32px; height: 32px;
+    display: grid; place-items: center; border-radius: 50%; font-weight: 700; font-size: 0.95rem;
+    color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  .site-footer { border-top: 1px solid var(--border); padding: 36px 0 48px; color: var(--muted); font-size: 0.9rem; }
+  .site-footer p { margin: 0 0 8px; max-width: 60em; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="brand-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7b3f9e"/>
+            <stop offset="1" stop-color="#d9582b"/>
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="14" fill="url(#brand-gradient)"/>
+        <rect x="12" y="15" width="40" height="27" rx="4" fill="none" stroke="#fff" stroke-width="4"/>
+        <path d="M24 50h16" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      Wallpaper Slideshow
+    </a>
+    <nav class="nav" aria-label="Page">
+      <a class="hide-sm" href="#why">Why</a>
+      <a href="#install">Install</a>
+      <a class="hide-sm" href="#use">Use</a>
+      <a href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Ubuntu 26.04 LTS · GNOME</span>
+        <h1>Every Ubuntu wallpaper, on rotation.</h1>
+        <p class="lede">Ubuntu 26.04 ships with a wallpaper slideshow that Settings can't show you. This small script sets up one that works: all 26 wallpapers, a new one every 30 minutes, with a soft crossfade.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#install">Install</a>
+          <a class="btn btn-secondary" href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+        <ul class="facts">
+          <li><strong>26</strong>wallpapers</li>
+          <li><strong>30 min</strong>per picture</li>
+          <li><strong>0</strong>background apps</li>
+        </ul>
+      </div>
+
+      <figure class="monitor">
+        <div class="screen" aria-hidden="true">
+          <div class="slide s1 is-active"></div>
+          <div class="slide s2"></div>
+          <div class="slide s3"></div>
+          <div class="slide s4"></div>
+          <div class="slide s5"></div>
+          <div class="slide s6"></div>
+          <div class="slide s7"></div>
+          <div class="topbar"><span class="clock">9:00</span></div>
+          <div class="dock"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="stand" aria-hidden="true"></div>
+        <div class="base" aria-hidden="true"></div>
+        <figcaption class="caption">Illustration: every half hour, the next wallpaper fades in.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block" id="why">
+    <div class="wrap narrow">
+      <h2>Why Ubuntu's slideshow is missing</h2>
+      <p class="section-lede">Ubuntu 26.04 includes an “Ubuntu 26.04 Community Slideshow”. It's meant to appear in Settings → Appearance, but the package lists it at the wrong path. Settings skips entries whose file doesn't exist, so it never shows up.</p>
+      <div class="paths">
+        <div class="path bad">
+          <span class="mark" aria-hidden="true">✕</span>
+          <span class="label">Settings looks for</span>
+          <code>/usr/share/backgrounds/resolute.xml</code>
+        </div>
+        <div class="path good">
+          <span class="mark" aria-hidden="true">✓</span>
+          <span class="label">The file is actually at</span>
+          <code>/usr/share/backgrounds/<ins>contest/</ins>resolute.xml</code>
+        </div>
+      </div>
+      <p>This is reported as Launchpad bugs <a href="https://bugs.launchpad.net/bugs/2152826">#2152826</a> and <a href="https://bugs.launchpad.net/bugs/2155126">#2155126</a>, confirmed but not yet fixed. Even if you turn Ubuntu's slideshow on by hand, it covers only 21 of the 26 wallpapers and leaves out the default wallpaper itself.</p>
+    </div>
+  </section>
+
+  <section class="block" id="install">
+    <div class="wrap narrow">
+      <h2>Install</h2>
+      <p class="section-lede">Open Terminal (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd>), paste these three lines and press <kbd>Enter</kbd>. Your background changes right away.</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>wget https://raw.githubusercontent.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow/main/cycle-desktop-pictures.sh
+chmod +x cycle-desktop-pictures.sh
+./cycle-desktop-pictures.sh</code></pre>
+      </div>
+      <ul class="notes">
+        <li>Run it as yourself, not with <code>sudo</code>.</li>
+        <li>Want a different pace? <code>./cycle-desktop-pictures.sh 20</code> shows each picture for 20 minutes.</li>
+        <li>The script is under 100 lines of commented Bash. <a href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow/blob/main/cycle-desktop-pictures.sh">Read it first</a> if you like.</li>
+        <li>You can delete the script after running it. Keep it if you want to change the interval later.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="features">
+    <div class="wrap">
+      <h2>What you get</h2>
+      <div class="features">
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="7" width="14" height="12" rx="2"/><path d="M7 4h12a2 2 0 0 1 2 2v10"/><path d="M3 16l4-4 4 4 2-2 4 4"/></svg>
+          <h3>Every wallpaper</h3>
+          <p>All 26 pictures that ship with Ubuntu 26.04, in a shuffled order.</p>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <h3>Every 30 minutes</h3>
+          <p>Or any interval you choose, with a 5-second crossfade between pictures.</p>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+          <h3>Light and dark style</h3>
+          <p>GNOME keeps a separate background for each style. The script sets both.</p>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+          <h3>Survives every login</h3>
+          <p>It's saved as your background setting, so nothing needs to start when you log in.</p>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+          <h3>Listed in Settings</h3>
+          <p>A tile with a slideshow icon in Settings → Appearance, to switch back any time.</p>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <h3>On the lock screen</h3>
+          <p>GNOME's lock screen shows the current picture, softly blurred.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="use">
+    <div class="wrap narrow">
+      <h2>Everyday use</h2>
+      <dl class="uses">
+        <div><dt>Change the interval</dt><dd><code>./cycle-desktop-pictures.sh 20</code> (minutes per picture)</dd></div>
+        <div><dt>Reshuffle the order</dt><dd>Run the script again.</dd></div>
+        <div><dt>Stop</dt><dd>Pick any other background in Settings → Appearance.</dd></div>
+        <div><dt>Start again</dt><dd>Pick the tile with the slideshow icon in Settings → Appearance.</dd></div>
+        <div><dt>Other accounts</dt><dd>The setting is per account. Each person runs the script once while logged in as themselves.</dd></div>
+      </dl>
+      <p>To uninstall, pick another background first, then remove the files the script created:</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>rm -r ~/.local/share/wallpaper-slideshow ~/.local/share/gnome-background-properties/all-ubuntu-wallpapers.xml</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="builtin">
+    <div class="wrap narrow">
+      <h2>Only want Ubuntu's own slideshow?</h2>
+      <p class="section-lede">Ubuntu's built-in slideshow has 21 pictures at 30 minutes each. To switch to it for your account:</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/contest/resolute.xml
+gsettings set org.gnome.desktop.background picture-uri-dark file:///usr/share/backgrounds/contest/resolute.xml</code></pre>
+      </div>
+      <p>Or fix the broken entry for everyone on this computer, so the slideshow shows up in Settings. This edits a file that belongs to the <code>ubuntu-wallpapers-resolute</code> package, so a future update to that package will replace it.</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>sudo sed -i 's:backgrounds/resolute.xml:backgrounds/contest/resolute.xml:' /usr/share/gnome-background-properties/resolute-wallpapers.xml</code></pre>
+      </div>
+      <p class="small">If <code>gsettings</code> says <code>No such key "picture-uri-dark"</code>, you're in the terminal of a snap app such as VS Code. Use the regular Terminal app instead.</p>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="wrap narrow">
+      <h2>How it works</h2>
+      <p class="section-lede">GNOME Shell can play a slideshow described by an XML file: a list of pictures with how long to show each one and how long to fade between them. The script builds one and hands it to GNOME.</p>
+      <ol class="steps">
+        <li><strong>Finds the pictures.</strong> Every image in <code>/usr/share/backgrounds</code>, with symlinks resolved so a picture with two names appears once.</li>
+        <li><strong>Writes a slideshow file.</strong> A shuffled list in <code>~/.local/share/wallpaper-slideshow/</code>: each picture for 29 minutes 55 seconds, then a 5-second fade.</li>
+        <li><strong>Lists it in Settings.</strong> An entry in <code>~/.local/share/gnome-background-properties/</code>, where Settings looks for extra backgrounds.</li>
+        <li><strong>Sets your background.</strong> Points <code>picture-uri</code> and <code>picture-uri-dark</code> at the slideshow. GNOME Shell does the rest.</li>
+      </ol>
+      <p class="small">Each run writes a new file name, because GNOME Shell caches slideshows by name and would otherwise keep the old order until you log out. Tested on Ubuntu 26.04.1 LTS with GNOME Shell 50.1.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>MIT licensed · <a href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow">Source on GitHub</a> · <a href="https://bugs.launchpad.net/bugs/2152826">Launchpad bug #2152826</a></p>
+    <p>An unofficial project, not affiliated with or endorsed by Canonical. Ubuntu is a registered trademark of Canonical Ltd. The wallpapers aren't included here; they come from Ubuntu's own packages.</p>
+  </div>
+</footer>
+
+<div id="copy-status" class="sr-only" aria-live="polite"></div>
+
+<script>
+  (() => {
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const clock = document.querySelector('.clock');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let index = 0;
+    let minutes = 9 * 60;
+    let timer = null;
+
+    const render = () => {
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+      clock.textContent = `${Math.floor(minutes / 60) % 24}:${String(minutes % 60).padStart(2, '0')}`;
+    };
+    const advance = () => {
+      index = (index + 1) % slides.length;
+      minutes += 30;
+      render();
+    };
+    const start = () => {
+      if (!timer && !reduceMotion.matches) timer = setInterval(advance, 3500);
+    };
+    const stop = () => {
+      clearInterval(timer);
+      timer = null;
+    };
+
+    render();
+    start();
+    reduceMotion.addEventListener?.('change', () => (reduceMotion.matches ? stop() : start()));
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+
+    const status = document.getElementById('copy-status');
+    document.querySelectorAll('.copy').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.closest('.code').querySelector('code');
+        try {
+          await navigator.clipboard.writeText(code.textContent);
+          button.textContent = 'Copied';
+          status.textContent = 'Copied to clipboard.';
+        } catch {
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          button.textContent = 'Press Ctrl+C';
+        }
+        setTimeout(() => { button.textContent = 'Copy'; }, 1800);
+      });
+    });
+  })();
+</script>
+</body>
+</html>
