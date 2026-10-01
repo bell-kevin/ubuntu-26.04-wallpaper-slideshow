@@ -59,6 +59,10 @@ notice when you pick a picture. It sleeps the rest of the time.
 
 ## Everyday use
 
+Run the `./cycle-desktop-pictures.sh` commands from the folder containing the
+script. From another folder, use its full path; see
+[Troubleshooting](#troubleshooting) for an example.
+
 | To | Do this |
 | --- | --- |
 | Jump to a picture | Pick it in Settings → Appearance; rotation continues unless paused |
@@ -173,6 +177,24 @@ A few details:
   variables before calling `gsettings`, so it works from any terminal.
 
 ## Troubleshooting
+
+**`No such file or directory` when running the script.** The `./` prefix looks
+in your terminal's current folder. If you saved the script inside
+`~/cycle desktop pictures`, you can pause it from any folder with:
+
+```bash
+"$HOME/cycle desktop pictures/cycle-desktop-pictures.sh" --pause
+```
+
+To resume:
+
+```bash
+"$HOME/cycle desktop pictures/cycle-desktop-pictures.sh" --resume
+```
+
+Replace the folder path if you saved it elsewhere. Keep the quotes around
+paths containing spaces. `cycle desktop pictures` is the folder;
+`cycle-desktop-pictures.sh` is the script inside it.
 
 **Only a few pictures are included.** The 21 community wallpapers come from
 the `ubuntu-wallpapers-resolute` package, which a standard install includes.
