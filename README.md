@@ -3,10 +3,11 @@
 Cycle your desktop background through every wallpaper that ships with
 Ubuntu 26.04 LTS, changing every 5 minutes with a 5-second crossfade. Want a
 particular picture? Pick it in **Settings → Appearance** as usual, and the
-slideshow carries on from there.
+slideshow carries on from there. Pause it whenever you want to keep a favorite
+on screen until you choose to resume.
 
-It uses GNOME's built-in slideshow support, so the slideshow carries on after
-every login.
+It uses GNOME's built-in slideshow support. Your slideshow or paused picture
+is remembered after every login.
 
 **Website:** <https://bell-kevin.github.io/ubuntu-26.04-wallpaper-slideshow/>
 
@@ -42,32 +43,75 @@ Your background changes right away. Run the script as yourself, not with
 
 - Builds a slideshow of every picture in `/usr/share/backgrounds` (the 26 that
   ship with Ubuntu 26.04, on a standard install) in random order.
-- Shows each one for 5 minutes, then fades into the next over 5 seconds.
+- Shows each one for 5 minutes, including a 5-second fade into the next.
+- Lets you choose a different duration for individual pictures.
+- Lets you pause on a picture for as long as you like, then resume rotation.
 - Sets it for both light and dark style, since GNOME keeps a separate
   background for each. The lock screen shows it too, blurred.
 - Keeps going when you pick a picture in **Settings → Appearance** (or with
   **Set as Background** in another app): your picture shows right away, and
-  5 minutes later the slideshow moves on.
+  the slideshow moves on after that picture's chosen duration (normally
+  5 minutes), unless you've paused it.
 
-GNOME saves your background as a setting, so the slideshow keeps going after
-every login and reboot. A small helper starts with your session to notice
-when you pick a picture. It sleeps the rest of the time.
+GNOME saves your background as a setting, so the slideshow or paused picture
+survives every login and reboot. A small helper starts with your session to
+notice when you pick a picture. It sleeps the rest of the time.
 
 ## Everyday use
 
 | To | Do this |
 | --- | --- |
-| Jump to a picture | Pick it in Settings → Appearance; the slideshow carries on from it |
-| Change the interval | `./cycle-desktop-pictures.sh 20` (minutes per picture) |
-| Reshuffle the order | Run the script again |
-| Stop | `./cycle-desktop-pictures.sh --stop` (the current picture stays) |
-| Start again | Run the script again |
+| Jump to a picture | Pick it in Settings → Appearance; rotation continues unless paused |
+| Keep the current picture until you choose | `./cycle-desktop-pictures.sh --pause` |
+| Resume rotation | `./cycle-desktop-pictures.sh --resume` (or `--unpause`) |
+| Give a picture more time on every rotation | `./cycle-desktop-pictures.sh --set-duration 30` (minutes) |
+| Restore its normal duration | `./cycle-desktop-pictures.sh --reset-duration` |
+| Change the normal interval | `./cycle-desktop-pictures.sh 20` (minutes per picture; keeps custom durations) |
+| Reshuffle the order | Run the script again while rotating |
+| Stop and uninstall | `./cycle-desktop-pictures.sh --stop` (the current picture stays) |
+| Start again after uninstalling | Run the script again |
 
 The setting is per account: each person who wants the slideshow runs the
 script once while logged in as themselves.
 
+To keep one of Ubuntu's pictures on screen, pick it in **Settings → Appearance**,
+then run `./cycle-desktop-pictures.sh --pause`. It stays until you run
+`./cycle-desktop-pictures.sh --resume`, even after logging out or restarting.
+Picking another picture while paused changes the picture and keeps rotation
+paused. Resuming starts a fresh interval from the currently selected picture.
+
+Pause keeps your interval, custom durations, and helper installed. Rerunning
+the script or changing the interval or custom durations won't unpause it;
+duration changes are saved for when you resume. You can also pause on a
+picture by its local file path:
+
+```bash
+./cycle-desktop-pictures.sh --pause /usr/share/backgrounds/warty-final-ubuntu.png
+```
+
+For a longer timed stay on every rotation, pick a picture and run
+`./cycle-desktop-pictures.sh --set-duration 30`. While rotating, this starts a
+fresh 30 minutes for that picture right away; other pictures keep their usual
+interval. While paused, it saves the duration for later. Its custom duration
+applies each time it appears, including after picking it again, logging in,
+or rerunning the script.
+
+Both `--set-duration MINUTES [PICTURE]` and `--reset-duration [PICTURE]`
+use the currently visible picture if you leave out `PICTURE`. To choose a
+picture by its local file path instead:
+
+```bash
+./cycle-desktop-pictures.sh --set-duration 30 /usr/share/backgrounds/warty-final-ubuntu.png
+```
+
+Quote paths that contain spaces. Durations must be positive whole minutes
+and include the 5-second crossfade. `--reset-duration` restores the normal
+interval for just that picture; you can pass the same file path to reset it
+while another picture is showing.
+
 `--stop` also uninstalls: it removes the helper and every file the script
-created. If you've deleted the script, run the copy the helper uses:
+created, including the pause state and saved custom durations. If you've
+deleted the script, run the copy the helper uses:
 
 ```bash
 ~/.local/share/wallpaper-slideshow/cycle-desktop-pictures.sh --stop
@@ -109,8 +153,9 @@ with how long to show each one and how long to fade between them. The script:
    at it.
 4. Starts a helper: a systemd user service, `wallpaper-slideshow.service`,
    that runs a copy of the script with `--watch`. It waits for the background
-   setting to change. When you pick a picture, it writes a new slideshow that
-   starts with that picture and switches to it about a second later.
+   setting to change. Unless paused, picking a picture makes it write a new
+   slideshow that starts with that picture and switches to it about a second
+   later.
 
 A few details:
 
@@ -137,9 +182,10 @@ run the script again.
 **Some pictures stopped showing after upgrading Ubuntu.** A new release
 replaces the wallpaper packages. Run the script again to rebuild the list.
 
-**Picking a picture stops the slideshow.** The helper isn't running. Check
-with `systemctl --user status wallpaper-slideshow`, then run the script again
-to reinstall and restart it.
+**The slideshow stays on one picture.** If you paused it, run
+`./cycle-desktop-pictures.sh --resume`. If picking pictures still stops rotation,
+check the helper with `systemctl --user status wallpaper-slideshow`, then run
+the script again to reinstall and restart it.
 
 Tested on Ubuntu 26.04.1 LTS with GNOME Shell 50.1.
 
