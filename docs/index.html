@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#141116" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ubuntu 26.04 Wallpaper Slideshow">
-<meta property="og:description" content="Every wallpaper that ships with Ubuntu 26.04, a new one every 5 minutes. Pick any picture and the slideshow carries on from it.">
+<meta property="og:description" content="Every wallpaper that ships with Ubuntu 26.04, a new one every 5 minutes. Pause on a favorite until you choose to resume.">
 <meta property="og:url" content="https://bell-kevin.github.io/ubuntu-26.04-wallpaper-slideshow/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237b3f9e'/%3E%3Cstop offset='1' stop-color='%23d9582b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Crect x='12' y='15' width='40' height='27' rx='4' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M24 50h16' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <script>document.documentElement.classList.add('js');</script>
@@ -307,7 +307,7 @@
       <div>
         <span class="eyebrow">Ubuntu 26.04 LTS · GNOME</span>
         <h1>Every Ubuntu wallpaper, on rotation.</h1>
-        <p class="lede">Ubuntu 26.04 ships with a wallpaper slideshow that Settings can't show you. This small script sets up one that works: all 26 wallpapers, a new one every 5 minutes, with a soft crossfade. Pick a picture whenever you like, and the slideshow carries on from there.</p>
+        <p class="lede">Ubuntu 26.04 ships with a wallpaper slideshow that Settings can't show you. This small script sets up one that works: all 26 wallpapers, a new one every 5 minutes, with a soft crossfade. Pick a picture whenever you like, or pause on a favorite until you choose to resume.</p>
         <div class="actions">
           <a class="btn btn-primary" href="#install">Install</a>
           <a class="btn btn-secondary" href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow">
@@ -317,7 +317,7 @@
         </div>
         <ul class="facts">
           <li><strong>26</strong>wallpapers</li>
-          <li><strong>5 min</strong>per picture</li>
+          <li><strong>5 min</strong>default interval</li>
           <li><strong>5 s</strong>crossfade</li>
         </ul>
       </div>
@@ -373,8 +373,8 @@ chmod +x cycle-desktop-pictures.sh
       </div>
       <ul class="notes">
         <li>Run it as yourself, not with <code>sudo</code>.</li>
-        <li>Want a different pace? <code>./cycle-desktop-pictures.sh 20</code> shows each picture for 20 minutes.</li>
-        <li>The script is about 250 lines of commented Bash. <a href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow/blob/main/cycle-desktop-pictures.sh">Read it first</a> if you like.</li>
+        <li>Want a different pace? <code>./cycle-desktop-pictures.sh 20</code> sets the normal interval to 20 minutes.</li>
+        <li>The script is commented Bash. <a href="https://github.com/bell-kevin/ubuntu-26.04-wallpaper-slideshow/blob/main/cycle-desktop-pictures.sh">Read it first</a> if you like.</li>
         <li>You can delete the script after running it, since its helper keeps a copy. Keep yours if you want to change the interval later.</li>
       </ul>
     </div>
@@ -391,8 +391,8 @@ chmod +x cycle-desktop-pictures.sh
         </div>
         <div class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <h3>Every 5 minutes</h3>
-          <p>Or any interval you choose, with a 5-second crossfade between pictures.</p>
+          <h3>Stay as long as you like</h3>
+          <p>Pause on a favorite until you choose to resume. You can also set longer durations for individual pictures; each timed interval includes a 5-second crossfade.</p>
         </div>
         <div class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
@@ -402,12 +402,12 @@ chmod +x cycle-desktop-pictures.sh
         <div class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
           <h3>Survives every login</h3>
-          <p>It's saved as your background setting, so the slideshow carries on after every login and restart.</p>
+          <p>Your slideshow or paused picture is remembered after every login and restart.</p>
         </div>
         <div class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
           <h3>Pick any picture</h3>
-          <p>Choose one in Settings → Appearance and it shows right away. The slideshow carries on from there.</p>
+          <p>Choose one in Settings → Appearance and it shows right away. Rotation continues unless you've paused it.</p>
         </div>
         <div class="card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
@@ -422,14 +422,31 @@ chmod +x cycle-desktop-pictures.sh
     <div class="wrap narrow">
       <h2>Everyday use</h2>
       <dl class="uses">
-        <div><dt>Jump to a picture</dt><dd>Pick it in Settings → Appearance. The slideshow carries on from it.</dd></div>
-        <div><dt>Change the interval</dt><dd><code>./cycle-desktop-pictures.sh 20</code> (minutes per picture)</dd></div>
-        <div><dt>Reshuffle the order</dt><dd>Run the script again.</dd></div>
-        <div><dt>Stop</dt><dd><code>./cycle-desktop-pictures.sh --stop</code> (the current picture stays)</dd></div>
-        <div><dt>Start again</dt><dd>Run the script again.</dd></div>
+        <div><dt>Jump to a picture</dt><dd>Pick it in Settings → Appearance. Rotation continues unless paused.</dd></div>
+        <div><dt>Keep this picture</dt><dd><code>./cycle-desktop-pictures.sh --pause</code> (until you choose to resume)</dd></div>
+        <div><dt>Resume rotation</dt><dd><code>./cycle-desktop-pictures.sh --resume</code> (or <code>--unpause</code>)</dd></div>
+        <div><dt>More time on every rotation</dt><dd><code>./cycle-desktop-pictures.sh --set-duration 30</code> (minutes)</dd></div>
+        <div><dt>Restore its normal duration</dt><dd><code>./cycle-desktop-pictures.sh --reset-duration</code></dd></div>
+        <div><dt>Change the normal interval</dt><dd><code>./cycle-desktop-pictures.sh 20</code> (minutes per picture; keeps custom durations)</dd></div>
+        <div><dt>Reshuffle the order</dt><dd>Run the script again while rotating.</dd></div>
+        <div><dt>Stop and uninstall</dt><dd><code>./cycle-desktop-pictures.sh --stop</code> (the current picture stays)</dd></div>
+        <div><dt>Start after uninstalling</dt><dd>Run the script again.</dd></div>
         <div><dt>Other accounts</dt><dd>The setting is per account. Each person runs the script once while logged in as themselves.</dd></div>
       </dl>
-      <p><code>--stop</code> also uninstalls: it removes the helper and every file the script created. If you've deleted the script, run the copy the helper uses:</p>
+      <p>To keep one of Ubuntu's pictures on screen, pick it in <strong>Settings → Appearance</strong>, then run <code>./cycle-desktop-pictures.sh --pause</code>. It stays until you run <code>./cycle-desktop-pictures.sh --resume</code>, even after logging out or restarting. Picking another picture while paused changes the picture and keeps rotation paused. Resuming starts a fresh interval from the currently selected picture.</p>
+      <p>Pause keeps your interval, custom durations, and helper installed. Rerunning the script or changing the interval or custom durations won't unpause it; duration changes are saved for when you resume. You can also pause on a picture by its local file path:</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>./cycle-desktop-pictures.sh --pause /usr/share/backgrounds/warty-final-ubuntu.png</code></pre>
+      </div>
+      <p>For a longer timed stay on every rotation, pick a picture and run <code>./cycle-desktop-pictures.sh --set-duration 30</code>. While rotating, this starts a fresh 30 minutes for that picture right away; other pictures keep their usual interval. While paused, it saves the duration for later. Its custom duration applies each time it appears, including after picking it again, logging in, or rerunning the script.</p>
+      <p>Both <code>--set-duration MINUTES [PICTURE]</code> and <code>--reset-duration [PICTURE]</code> use the currently visible picture if you leave out <code>PICTURE</code>. To choose a picture by its local file path instead:</p>
+      <div class="code">
+        <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>./cycle-desktop-pictures.sh --set-duration 30 /usr/share/backgrounds/warty-final-ubuntu.png</code></pre>
+      </div>
+      <p>Quote paths that contain spaces. Durations must be positive whole minutes and include the 5-second crossfade. <code>--reset-duration</code> restores the normal interval for just that picture; you can pass the same file path to reset it while another picture is showing.</p>
+      <p><code>--stop</code> also uninstalls: it removes the helper and every file the script created, including the pause state and saved custom durations. If you've deleted the script, run the copy the helper uses:</p>
       <div class="code">
         <div class="code-head"><span>Terminal</span><button class="copy" type="button">Copy</button></div>
         <pre><code>~/.local/share/wallpaper-slideshow/cycle-desktop-pictures.sh --stop</code></pre>
@@ -461,9 +478,9 @@ gsettings set org.gnome.desktop.background picture-uri-dark file:///usr/share/ba
       <p class="section-lede">GNOME Shell can play a slideshow described by an XML file: a list of pictures with how long to show each one and how long to fade between them. The script builds one and hands it to GNOME.</p>
       <ol class="steps">
         <li><strong>Finds the pictures.</strong> Every image in <code>/usr/share/backgrounds</code>, with symlinks resolved so a picture with two names appears once.</li>
-        <li><strong>Writes a slideshow file.</strong> A shuffled list in <code>~/.local/share/wallpaper-slideshow/</code>: each picture for 4 minutes 55 seconds, then a 5-second fade.</li>
+        <li><strong>Writes a slideshow file.</strong> A shuffled list in <code>~/.local/share/wallpaper-slideshow/</code>, using each picture's custom duration or the normal interval. At the default 5 minutes, that's 4 minutes 55 seconds followed by a 5-second fade.</li>
         <li><strong>Sets your background.</strong> Points <code>picture-uri</code> and <code>picture-uri-dark</code> at the slideshow. GNOME Shell does the rest.</li>
-        <li><strong>Starts a helper.</strong> A systemd user service, <code>wallpaper-slideshow.service</code>, waits for your background setting to change. When you pick a picture, it writes a new slideshow that starts with it and switches over about a second later.</li>
+        <li><strong>Starts a helper.</strong> A systemd user service, <code>wallpaper-slideshow.service</code>, waits for your background setting to change. Unless paused, picking a picture makes it write a new slideshow that starts with it and switches over about a second later.</li>
       </ol>
       <p class="small">Each new slideshow gets a new file name, because GNOME Shell caches slideshows by name and would otherwise keep the old order until you log out. A picture of your own works too: it's shown first and stays in the rotation until you pick another. Tested on Ubuntu 26.04.1 LTS with GNOME Shell 50.1.</p>
     </div>
