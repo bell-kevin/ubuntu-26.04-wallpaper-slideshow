@@ -421,6 +421,7 @@ chmod +x cycle-desktop-pictures.sh
   <section class="block" id="use">
     <div class="wrap narrow">
       <h2>Everyday use</h2>
+      <p>Run commands beginning with <code>./cycle-desktop-pictures.sh</code> from the folder containing the script. From another folder, use its full path.</p>
       <dl class="uses">
         <div><dt>Jump to a picture</dt><dd>Pick it in Settings → Appearance. Rotation continues unless paused.</dd></div>
         <div><dt>Keep this picture</dt><dd><code>./cycle-desktop-pictures.sh --pause</code> (until you choose to resume)</dd></div>
@@ -433,6 +434,15 @@ chmod +x cycle-desktop-pictures.sh
         <div><dt>Start after uninstalling</dt><dd>Run the script again.</dd></div>
         <div><dt>Other accounts</dt><dd>The setting is per account. Each person runs the script once while logged in as themselves.</dd></div>
       </dl>
+      <p>If you saved it in <code>~/cycle desktop pictures</code>, these commands work from any folder. Replace that folder if you saved it elsewhere; the quotes handle spaces in the path.</p>
+      <div class="code">
+        <div class="code-head"><span>Pause rotation</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>"$HOME/cycle desktop pictures/cycle-desktop-pictures.sh" --pause</code></pre>
+      </div>
+      <div class="code">
+        <div class="code-head"><span>Resume rotation</span><button class="copy" type="button">Copy</button></div>
+        <pre><code>"$HOME/cycle desktop pictures/cycle-desktop-pictures.sh" --resume</code></pre>
+      </div>
       <p>To keep one of Ubuntu's pictures on screen, pick it in <strong>Settings → Appearance</strong>, then run <code>./cycle-desktop-pictures.sh --pause</code>. It stays until you run <code>./cycle-desktop-pictures.sh --resume</code>, even after logging out or restarting. Picking another picture while paused changes the picture and keeps rotation paused. Resuming starts a fresh interval from the currently selected picture.</p>
       <p>Pause keeps your interval, custom durations, and helper installed. Rerunning the script or changing the interval or custom durations won't unpause it; duration changes are saved for when you resume. You can also pause on a picture by its local file path:</p>
       <div class="code">
